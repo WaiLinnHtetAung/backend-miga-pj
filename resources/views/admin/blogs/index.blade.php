@@ -57,7 +57,7 @@
                                 <img src="{{ asset('/storage/photos/'.$blog->photo) }}" width="100" height="60" alt="">
                             </td>
                             <td>
-                                {!! $blog->body ?? '' !!}
+                                {!! $blog->body ? substr($blog->body, 0, 200).' ......' : '' !!}
                             </td>
                             <td>
                                 @can('blog_show')
