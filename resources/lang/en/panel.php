@@ -1,6 +1,6 @@
 <?php
 
 return [
-    'site_title' => 'Admin-panel',
+    'site_title' => 'RIHEA-Admin',
 
 ];
