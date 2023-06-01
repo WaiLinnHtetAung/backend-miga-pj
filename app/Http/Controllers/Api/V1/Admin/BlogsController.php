@@ -91,4 +91,13 @@ class BlogsController extends Controller
     {
         //
     }
+
+    public function getTopBlogs() {
+        $topBlogs = Blog::take(3)->get();
+
+        return response()->json([
+            'status'    => true,
+            'topBlogs'  => $topBlogs
+        ]);
+    }
 }
