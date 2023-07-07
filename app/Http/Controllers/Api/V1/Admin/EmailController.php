@@ -34,7 +34,7 @@ class EmailController extends Controller
             'fax' => $fax
         ];
 
-        Mail::to('htunhsuhlaing0@gmail.com')->send(new TestMail($mailData));
+        Mail::to('hotelier.financedept@gmail.com')->send(new TestMail($mailData));
 
 
         return response()->json(['message' => 'form submit success']);
