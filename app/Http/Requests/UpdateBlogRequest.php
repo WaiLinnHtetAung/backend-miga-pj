@@ -30,6 +30,9 @@ class UpdateBlogRequest extends FormRequest
             'date' => [
                 'required',
             ],
+            'images' => [
+                'required'
+            ],
             'body' => [
                 'required'
             ]

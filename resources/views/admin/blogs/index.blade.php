@@ -54,7 +54,7 @@
                                 {{ $blog->title ?? '' }}
                             </td>
                             <td class="text-center">
-                                <img src="{{ asset('/storage/photos/'.$blog->photo) }}" width="100" height="60" alt="">
+                                <img src="{{ asset('/storage/images/'.$blog->blogImages[0]->image) }}" width="100" height="60" alt="">
                             </td>
                             <td>
                                 {!! $blog->body ? substr($blog->body, 0, 200).' ......' : '' !!}

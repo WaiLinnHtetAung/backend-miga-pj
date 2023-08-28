@@ -44,7 +44,9 @@
                             {{ trans('cruds.blog.fields.photo') }}
                         </th>
                         <td >
-                            <img src="{{ asset('/storage/photos/'.$blog->photo) }}" width="100" height="60" alt="">
+                            @foreach ($blog->blogImages as $img)
+                                <img src="{{ asset('/storage/images/'.$img->image) }}" class="me-2" width="100" height="60" alt="">
+                            @endforeach
                         </td>
                     </tr>
                     <tr>

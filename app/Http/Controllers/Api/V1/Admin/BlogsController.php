@@ -15,7 +15,7 @@ class BlogsController extends Controller
      */
     public function index()
     {
-        $blogs = Blog::all();
+        $blogs = Blog::with('blogImages')->get();
 
         return response()->json([
             'status' => true,
@@ -54,7 +54,7 @@ class BlogsController extends Controller
     {
         return response()->json([
             'status' => true,
-            'blog'   => $blog
+            'blog'   => $blog->load('blogImages')
         ]);
     }
 
@@ -93,7 +93,7 @@ class BlogsController extends Controller
     }
 
     public function getTopBlogs() {
-        $topBlogs = Blog::take(3)->get();
+        $topBlogs = Blog::with('blogImages')->orderBy('created_at', 'desc')->take(3)->get();
 
         return response()->json([
             'status'    => true,

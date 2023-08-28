@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Blog;
+use App\Models\BlogImage;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
 use App\Http\Requests\StoreBlogRequest;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UpdateBlogRequest;
@@ -18,7 +20,8 @@ class BlogsController extends Controller
      */
     public function index()
     {
-        $blogs = Blog::all();
+        $blogs = Blog::with('blogImages')->get();
+
         return view('admin.blogs.index', compact('blogs'));
     }
 
@@ -32,6 +35,33 @@ class BlogsController extends Controller
         return view('admin.blogs.create');
     }
 
+    public function storeMedia(Request $request)
+    {
+        $path = storage_path('tmp/uploads');
+
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        $file = $request->file('file');
+
+        $name = uniqid() . '_' . trim($file->getClientOriginalName());
+
+        $file->move($path, $name);
+
+        return response()->json([
+            'name'          => $name,
+            'original_name' => $file->getClientOriginalName(),
+        ]);
+    }
+
+    public function deleteMedia(Request $request) {
+        $file = $request->file_name;
+        File::delete(storage_path('tmp/uploads/'.$file));
+
+        return 'success';
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -40,15 +70,20 @@ class BlogsController extends Controller
      */
     public function store(StoreBlogRequest $request)
     {
-        $fileName = uniqid().$request->file('photo')->getClientOriginalName();
-        $request->file('photo')->storeAs('public/photos', $fileName);
 
-        Blog::create([
-            'title' => $request->title,
-            'date'  => $request->date,
-            'photo' => $fileName,
-            'body'  => $request->body,
-        ]);
+        logger($request->input('images'));
+
+        $blog = Blog::create($request->all());
+
+        foreach($request->input('images') as $image) {
+            File::move(storage_path('tmp/uploads/'.$image), public_path('storage/images/'.$image));
+            File::delete(storage_path('tmp/uploads/'.$image));
+
+            BlogImage::create([
+                'image'     => $image,
+                'blog_id'   => $blog->id,
+            ]);
+        }
 
         return redirect()->route('admin.blogs.index');
     }
@@ -86,23 +121,29 @@ class BlogsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateBlogRequest $request, $id)
+    public function update(UpdateBlogRequest $request, Blog $blog)
     {
-        $fileName = Blog::findOrFail($id)->photo;
-        if($request->hasFile('photo')) {
-            if($fileName) {
-                Storage::disk('public')->delete('photos/'.$fileName);
-            }
+        //Deleting Removed Images
+        $removedImages = collect($blog->blogImages)->pluck('image')->diff($request->input('images'));
 
-            $newFileName = uniqid().$request->file('photo')->getClientOriginalName();
-            $request->file('photo')->storeAs('public/photos', $newFileName);
+        foreach($removedImages as $removedImage) {
+            File::delete(public_path('storage/images/'.$removedImage));
+            $blog->blogImages()->where('image', $removedImage)->delete();
         }
-        Blog::findOrFail($id)->update([
-            'date'  => $request->date,
-            'title' => $request->title,
-            'body'  => $request->body,
-            'photo' => $request->file('photo') ? $newFileName : $fileName,
-        ]);
+
+        //Adding Nes Images
+        foreach($request->input('images') as $image) {
+            if(!$blog->blogImages()->where('image', $image)->exists()) {
+                File::move(storage_path('tmp/uploads/'.$image), public_path('storage/images/'.$image));
+
+                BlogImage::create([
+                    'image'     => $image,
+                    'blog_id'   => $blog->id
+                ]);
+            }
+        }
+
+        $blog->update($request->all());
 
         return redirect()->route('admin.blogs.index');
     }
@@ -113,11 +154,14 @@ class BlogsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Blog $blog)
     {
         //delete photo
-        Storage::disk('public')->delete('photos/'.Blog::findOrFail($id)->photo);
-        Blog::findOrFail($id)->delete();
+        foreach($blog->blogImages as $img) {
+
+            Storage::disk('public')->delete('images/'.$img->image);
+        }
+        $blog->delete();
 
         return redirect()->route('admin.blogs.index');
     }

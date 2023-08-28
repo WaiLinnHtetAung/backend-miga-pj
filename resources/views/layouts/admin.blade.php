@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="{{ asset('frestui/assets/vendor/libs/select2/select2.css') }}" />
     <link rel="stylesheet" href="{{ asset('frestui/assets/vendor/css/pages/app-calendar.css') }}" />
     <link rel="stylesheet" href="{{ asset('frestui/assets/vendor/libs/fullcalendar/fullcalendar.css') }}" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" rel="stylesheet" />
+
     {{-- fresui --}}
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -208,6 +210,7 @@
     {{-- --text-editor--  --}}
     <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js"></script>
 
 
 

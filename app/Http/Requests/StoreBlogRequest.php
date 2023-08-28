@@ -30,10 +30,8 @@ class StoreBlogRequest extends FormRequest
             'date' => [
                 'required',
             ],
-            'photo' => [
+            'images' => [
                 'required',
-                'image',
-                'max:2048'
             ],
             'body' => [
                 'required'

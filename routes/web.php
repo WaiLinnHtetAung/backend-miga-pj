@@ -26,6 +26,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     Route::resource('users', 'UsersController');
 
     //blogs
+    Route::post('blogs/media', 'BlogsController@storeMedia')->name('blogs.storeMedia');
+    Route::post('blogs/delmedia', 'BlogsController@deleteMedia')->name('blogs.deleteMedia');
     Route::resource('blogs', 'BlogsController');
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
